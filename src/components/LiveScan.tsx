@@ -179,6 +179,19 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
         };
     }, [isCameraOn, isAutoCaptureEnabled, isAnalyzing, isScanning, handleAnalyzeFrame, autoCaptureThreshold]);
     
+    const videoContainerClasses = [
+        'relative', 'w-full', 'max-w-4xl', 'mx-auto', 'aspect-video', 'bg-slate-900',
+        'rounded-lg', 'overflow-hidden', 'border-4', 'shadow-inner', 'transition-all', 'duration-300'
+    ];
+
+    if (isScanning && !isAnalyzing) {
+        videoContainerClasses.push('border-blue-500/80', 'animate-breathing-border');
+    } else if (isAnalyzing) {
+        videoContainerClasses.push('border-amber-500/50');
+    } else {
+        videoContainerClasses.push('border-slate-200');
+    }
+
     return (
         <div className="space-y-6 animate-fade-in">
              <div className="text-center">
@@ -204,27 +217,22 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
                 </div>
             )}
 
-            <div className={`relative w-full max-w-4xl mx-auto aspect-video bg-slate-900 rounded-lg overflow-hidden border-4 shadow-inner transition-colors duration-500 ${isAnalyzing ? 'border-amber-500' : 'border-slate-200'}`}>
-                {isAnalyzing && <div className="absolute inset-0 border-4 border-amber-500 rounded-lg animate-pulse-slow z-10 pointer-events-none"></div>}
+            <div className={videoContainerClasses.join(' ')}>
+                {isAnalyzing && (
+                    <div className="absolute inset-0 border-4 border-amber-500 rounded-lg animate-pulse-slow z-10 pointer-events-none"></div>
+                )}
+                
                 <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
                 <canvas ref={captureCanvasRef} className="hidden" />
-                
-                {isScanning && !isAnalyzing && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white p-4 z-20">
-                        <Spinner />
-                        <p className="mt-2 font-semibold">Scanning for a clear shot...</p>
-                        <p className="text-sm text-slate-300">Hold egg steady in the center.</p>
-                    </div>
-                )}
                 
                 {!isCameraOn && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-60 text-center p-4">
                         {isLoading ? (
-                            <>
-                                <Spinner size="lg" />
+                            <div className="animate-pulse">
+                                <Spinner size="lg" className="text-white mx-auto"/>
                                 <p className="text-slate-300 mt-4 text-lg font-semibold">Initializing Camera...</p>
-                                <p className="text-slate-400 mt-1 text-sm">Please allow camera permissions if prompted.</p>
-                            </>
+                                <p className="text-slate-400 mt-1 text-sm">Please allow camera permissions.</p>
+                            </div>
                         ) : (
                             <>
                                 <CameraIcon className="w-24 h-24 text-slate-600" />
@@ -232,6 +240,13 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
                             </>
                         )}
                     </div>
+                )}
+                
+                {isScanning && !isAnalyzing && (
+                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white p-4 z-20 transition-opacity duration-300">
+                         <Spinner className="text-white"/>
+                         <p className="mt-2 font-semibold">Scanning for a clear shot...</p>
+                     </div>
                 )}
             </div>
 
