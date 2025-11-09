@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { UploadIcon, SparklesIcon, MaleIcon, FemaleIcon } from './Icons';
 import Spinner from './Spinner';
+import { useToast } from '../hooks/useToast';
 
 type Gender = 'male' | 'female';
 
@@ -12,7 +13,7 @@ const ContributeData: React.FC = () => {
   const [gender, setGender] = useState<Gender | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const addToast = useToast();
 
   const resetForm = useCallback(() => {
     setImageFile(null);
@@ -32,7 +33,6 @@ const ContributeData: React.FC = () => {
       };
       reader.readAsDataURL(file);
       setError(null);
-      setSuccessMessage(null);
     }
   };
 
@@ -53,7 +53,6 @@ const ContributeData: React.FC = () => {
 
     setIsLoading(true);
     setError(null);
-    setSuccessMessage(null);
 
     // This is a simulation. In a real application, you would upload the imageFile and gender 
     // label to a secure backend service for storage and model retraining.
@@ -61,14 +60,11 @@ const ContributeData: React.FC = () => {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     setIsLoading(false);
-    setSuccessMessage('Thank you! Your contribution will help improve the AI model.');
+    addToast('Thank you! Your contribution will help improve the AI model.', 'success');
     
-    setTimeout(() => {
-        resetForm();
-        setSuccessMessage(null);
-    }, 3000);
+    resetForm();
 
-  }, [imageFile, gender, resetForm]);
+  }, [imageFile, gender, resetForm, addToast]);
 
   const Step = ({ number, title, children }: { number: number, title: string, children: React.ReactNode}) => (
     <div className="space-y-3 transition-opacity duration-500">
@@ -136,7 +132,6 @@ const ContributeData: React.FC = () => {
             
         <div className="min-h-[3rem] flex items-center justify-center pt-4">
             {error && <p className="text-red-600 bg-red-100 p-3 rounded-lg w-full text-center font-semibold animate-shake">{error}</p>}
-            {successMessage && <p className="text-green-700 bg-green-100 p-3 rounded-lg w-full text-center font-semibold animate-fade-in">{successMessage}</p>}
         </div>
       </div>
     </div>

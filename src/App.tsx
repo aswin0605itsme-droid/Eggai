@@ -25,6 +25,11 @@ const App: React.FC = () => {
     setBatchLog(prevLog => [newResult, ...prevLog]);
   };
 
+  // FIX: Added the clearLog function to pass to the BatchLog component.
+  const clearLog = () => {
+    setBatchLog([]);
+  };
+
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case 'analyze':
@@ -83,7 +88,7 @@ const App: React.FC = () => {
           </div>
         </div>
         
-        <BatchLog log={batchLog} />
+        <BatchLog log={batchLog} clearLog={clearLog} />
 
       </main>
        <footer className="text-center p-6 text-sm text-slate-500">

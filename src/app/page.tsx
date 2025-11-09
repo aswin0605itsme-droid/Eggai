@@ -12,6 +12,8 @@ import BatchLog from '../components/BatchLog';
 import ImageGenerator from '../components/ImageGenerator';
 import { EggIcon, CameraIcon, ClipboardListIcon, BeakerIcon, DatabasePlusIcon, SearchIcon, ImageIcon } from '../components/Icons';
 import { BatchResult } from '../types';
+import { ToastProvider } from '../contexts/ToastContext';
+import ToastContainer from '../components/ToastContainer';
 
 type Tab = 'analyze' | 'live' | 'batch' | 'model' | 'contribute' | 'research' | 'image';
 
@@ -25,6 +27,10 @@ export default function HomePage() {
       timestamp: new Date().toLocaleString(),
     }
     setBatchLog(prevLog => [newResult, ...prevLog]);
+  };
+  
+  const clearLog = () => {
+    setBatchLog([]);
   };
 
   const renderTabContent = useCallback(() => {
@@ -67,33 +73,35 @@ export default function HomePage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Header />
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200/80">
-          <div className="flex border-b border-slate-200 bg-white">
-            <TabButton tab="analyze" label="Analyze Egg" icon={<EggIcon className="w-6 h-6" />} />
-            <TabButton tab="live" label="Live Scan" icon={<CameraIcon className="w-6 h-6" />} />
-            <TabButton tab="batch" label="Batch" icon={<ClipboardListIcon className="w-6 h-6" />} />
-            <TabButton tab="model" label="Simulator" icon={<BeakerIcon className="w-6 h-6" />} />
-            <TabButton tab="contribute" label="Contribute" icon={<DatabasePlusIcon className="w-6 h-6" />} />
-            <TabButton tab="research" label="Research" icon={<SearchIcon className="w-6 h-6" />} />
-            <TabButton tab="image" label="Generate" icon={<ImageIcon className="w-6 h-6" />} />
-          </div>
-          <div className="p-4 sm:p-6 md:p-8 bg-slate-50/70">
-            <div key={activeTab} className="animate-slide-in-fade-up">
-              {renderTabContent()}
+    <ToastProvider>
+      <div className="min-h-screen bg-slate-50">
+        <Header />
+        <main className="container mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200/80">
+            <div className="flex border-b border-slate-200 bg-white">
+              <TabButton tab="analyze" label="Analyze Egg" icon={<EggIcon className="w-6 h-6" />} />
+              <TabButton tab="live" label="Live Scan" icon={<CameraIcon className="w-6 h-6" />} />
+              <TabButton tab="batch" label="Batch" icon={<ClipboardListIcon className="w-6 h-6" />} />
+              <TabButton tab="model" label="Simulator" icon={<BeakerIcon className="w-6 h-6" />} />
+              <TabButton tab="contribute" label="Contribute" icon={<DatabasePlusIcon className="w-6 h-6" />} />
+              <TabButton tab="research" label="Research" icon={<SearchIcon className="w-6 h-6" />} />
+              <TabButton tab="image" label="Generate" icon={<ImageIcon className="w-6 h-6" />} />
+            </div>
+            <div className="p-4 sm:p-6 md:p-8 bg-slate-50/70">
+              <div key={activeTab} className="animate-slide-in-fade-up">
+                {renderTabContent()}
+              </div>
             </div>
           </div>
-        </div>
-        
-        <BatchLog log={batchLog} />
+          
+          <BatchLog log={batchLog} clearLog={clearLog} />
 
-      </main>
-       <footer className="text-center p-6 text-sm text-slate-500">
-        {/* FIX: Corrected typo from newgetFullYear() to new Date().getFullYear() */}
-        <p>&copy; {new Date().getFullYear()} Chick-Sexing AI Assistant. All rights reserved.</p>
-      </footer>
-    </div>
+        </main>
+        <footer className="text-center p-6 text-sm text-slate-500">
+          <p>&copy; {new Date().getFullYear()} Chick-Sexing AI Assistant. All rights reserved.</p>
+        </footer>
+        <ToastContainer />
+      </div>
+    </ToastProvider>
   );
 };

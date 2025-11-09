@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { analyzeEggImage } from '../services/geminiService';
-import { UploadIcon, SparklesIcon } from './Icons';
+import { UploadIcon, SparklesIcon, ClipboardIcon, CheckIcon } from './Icons';
 import Spinner from './Spinner';
 import { BatchResult } from '../types';
 
@@ -17,10 +17,11 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [batchNumber, setBatchNumber] = useState<string>('');
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
+  const handleFileSelect = (file: File | null) => {
+    if (file && file.type.startsWith('image/')) {
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -29,6 +30,35 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
       reader.readAsDataURL(file);
       setAnalysis('');
       setError(null);
+    } else {
+      setError("Please select a valid image file (PNG, JPG, etc.).");
+    }
+  };
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleFileSelect(event.target.files?.[0] || null);
+  };
+  
+  const handleDragEvents = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
+    handleDragEvents(e);
+    if (batchNumber) setIsDragging(true);
+  };
+  
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    handleDragEvents(e);
+    setIsDragging(false);
+  };
+  
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    handleDragEvents(e);
+    setIsDragging(false);
+    if (batchNumber) {
+      handleFileSelect(e.dataTransfer.files?.[0] || null);
     }
   };
 
@@ -45,6 +75,7 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
     setIsLoading(true);
     setError(null);
     setAnalysis('');
+    setIsCopied(false);
 
     try {
       let fullText = '';
@@ -70,6 +101,12 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
       setIsLoading(false);
     }
   }, [imageFile, batchNumber, addBatchResult]);
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(analysis);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
 
   return (
     <div className="space-y-8">
@@ -99,11 +136,18 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
           <div>
             <label htmlFor="egg-upload" className="block text-sm font-bold text-slate-700 mb-2">Step 2: Upload Egg Image</label>
             <div className="w-full">
-              <label htmlFor="egg-upload" className={`group flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300 relative overflow-hidden ${!batchNumber ? 'bg-slate-100 cursor-not-allowed border-slate-300' : 'bg-amber-50 hover:bg-amber-100 border-amber-300 hover:border-amber-400'}`}>
+              <label 
+                htmlFor="egg-upload" 
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragEvents}
+                onDrop={handleDrop}
+                className={`group flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300 relative overflow-hidden ${!batchNumber ? 'bg-slate-100 cursor-not-allowed border-slate-300' : isDragging ? 'bg-amber-100 border-amber-400 border-solid' : 'bg-amber-50 hover:bg-amber-100 border-amber-300 hover:border-amber-400'}`}
+              >
                 {imagePreview && batchNumber ? (
                   <img src={imagePreview} alt="Egg preview" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 ) : (
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center z-10">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center z-10 pointer-events-none">
                     <UploadIcon className="w-10 h-10 mb-3 text-amber-500 transition-transform group-hover:scale-110" />
                     <p className="mb-2 text-sm text-amber-700"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                     <p className="text-xs text-amber-600">PNG, JPG, or WEBP</p>
@@ -126,7 +170,18 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-slate-700">Analysis Results</h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-slate-700">Analysis Results</h3>
+            {analysis && !isLoading && (
+              <button 
+                onClick={handleCopyToClipboard}
+                className={`flex items-center gap-1.5 text-sm font-semibold py-1 px-2.5 rounded-md transition-colors ${isCopied ? 'bg-green-100 text-green-700' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}
+              >
+                {isCopied ? <CheckIcon className="w-4 h-4" /> : <ClipboardIcon className="w-4 h-4" />}
+                {isCopied ? 'Copied!' : 'Copy'}
+              </button>
+            )}
+          </div>
           <div className="bg-white rounded-xl p-6 min-h-[24rem] border border-slate-200 shadow-sm">
             {error && <p className="text-red-500">{error}</p>}
             {isLoading && (

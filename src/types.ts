@@ -15,3 +15,11 @@ export interface BatchResult {
   source: 'Image' | 'Live Scan';
   timestamp: string;
 }
+
+export type ToastType = 'success' | 'error' | 'info';
+
+export interface ToastMessage {
+  id: number;
+  message: string;
+  type: ToastType;
+}

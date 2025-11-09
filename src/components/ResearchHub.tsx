@@ -76,7 +76,7 @@ const ResearchHub: React.FC = () => {
         case 'web':
           const webRes = await searchWeb(prompt);
           setGroundingResult({
-            text: webRes.text,
+            text: webRes.text || '',
             chunks: webRes.candidates?.[0]?.groundingMetadata?.groundingChunks || [],
           });
           break;
@@ -87,7 +87,7 @@ const ResearchHub: React.FC = () => {
                 const { latitude, longitude } = position.coords;
                 const mapsRes = await searchMaps(prompt, { latitude, longitude });
                 setGroundingResult({
-                  text: mapsRes.text,
+                  text: mapsRes.text || '',
                   chunks: mapsRes.candidates?.[0]?.groundingMetadata?.groundingChunks || [],
                 });
               } catch(err) {
