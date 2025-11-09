@@ -15,7 +15,8 @@ export default {
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'shake': 'shake 0.5s ease-in-out',
-        'fade-in': 'fadeIn 0.5s ease-in-out'
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+        'slide-in-fade-up': 'slideInFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
       },
       keyframes: {
         shake: {
@@ -26,9 +27,15 @@ export default {
         fadeIn: {
           'from': { opacity: 0, transform: 'translateY(10px)' },
           'to': { opacity: 1, transform: 'translateY(0)' },
+        },
+        slideInFadeUp: {
+          'from': { opacity: 0, transform: 'translateY(20px)' },
+          'to': { opacity: 1, transform: 'translateY(0)' },
         }
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

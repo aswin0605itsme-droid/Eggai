@@ -71,9 +71,9 @@ const ContributeData: React.FC = () => {
   }, [imageFile, gender, resetForm]);
 
   const Step = ({ number, title, children }: { number: number, title: string, children: React.ReactNode}) => (
-    <div className="space-y-3">
+    <div className="space-y-3 transition-opacity duration-500">
         <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-500 text-white font-bold">{number}</div>
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-500 text-white font-bold shadow-sm">{number}</div>
             <h3 className="text-lg font-semibold text-slate-700">{title}</h3>
         </div>
         <div className="pl-11">{children}</div>
@@ -81,7 +81,7 @@ const ContributeData: React.FC = () => {
   )
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-3xl font-bold text-slate-800 font-serif">Help Us Improve</h2>
         <p className="text-slate-600 mt-2 max-w-2xl mx-auto">
@@ -89,13 +89,13 @@ const ContributeData: React.FC = () => {
         </p>
       </div>
 
-      <div className="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-slate-200 space-y-8">
+      <div className="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-slate-200/80 space-y-8">
         <Step number={1} title="Upload Egg Image">
             <label htmlFor="contribution-upload" className="group flex flex-col items-center justify-center w-full h-56 border-2 border-amber-300 border-dashed rounded-lg cursor-pointer bg-amber-50 hover:bg-amber-100 transition-colors relative overflow-hidden">
               {imagePreview ? (
-                 <img src={imagePreview} alt="Egg contribution preview" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                 <img src={imagePreview} alt="Egg contribution preview" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
               ) : (
-                <div className="flex flex-col items-center justify-center">
+                <div className="flex flex-col items-center justify-center transition-transform duration-300 group-hover:scale-105">
                     <UploadIcon className="w-10 h-10 mb-3 text-amber-500" />
                     <p className="text-sm text-amber-700"><span className="font-semibold">Click to upload</span> or drag & drop</p>
                     <p className="text-xs text-amber-600">PNG, JPG, or WEBP</p>
@@ -109,14 +109,14 @@ const ContributeData: React.FC = () => {
              <div className="grid grid-cols-2 gap-4">
                 <button 
                     onClick={() => handleGenderSelect('female')}
-                    className={`group flex flex-col items-center justify-center gap-2 py-4 rounded-lg border-2 transition-all duration-200 transform hover:-translate-y-1 ${gender === 'female' ? 'bg-pink-500 text-white border-pink-600 shadow-md' : 'bg-white hover:bg-pink-50 hover:border-pink-400 border-slate-300'}`}
+                    className={`group flex flex-col items-center justify-center gap-2 py-4 rounded-lg border-2 transition-all duration-200 transform hover:-translate-y-1 ${gender === 'female' ? 'bg-pink-500 text-white border-pink-600 shadow-lg scale-105' : 'bg-white hover:bg-pink-50 hover:border-pink-400 border-slate-300'}`}
                 >
                     <FemaleIcon className={`w-8 h-8 transition-colors ${gender === 'female' ? 'text-white' : 'text-pink-400 group-hover:text-pink-500'}`} />
                     <span className="font-semibold">Female</span>
                 </button>
                 <button 
                     onClick={() => handleGenderSelect('male')}
-                    className={`group flex flex-col items-center justify-center gap-2 py-4 rounded-lg border-2 transition-all duration-200 transform hover:-translate-y-1 ${gender === 'male' ? 'bg-blue-500 text-white border-blue-600 shadow-md' : 'bg-white hover:bg-blue-50 hover:border-blue-400 border-slate-300'}`}
+                    className={`group flex flex-col items-center justify-center gap-2 py-4 rounded-lg border-2 transition-all duration-200 transform hover:-translate-y-1 ${gender === 'male' ? 'bg-blue-500 text-white border-blue-600 shadow-lg scale-105' : 'bg-white hover:bg-blue-50 hover:border-blue-400 border-slate-300'}`}
                 >
                     <MaleIcon className={`w-8 h-8 transition-colors ${gender === 'male' ? 'text-white' : 'text-blue-400 group-hover:text-blue-500'}`} />
                     <span className="font-semibold">Male</span>
@@ -128,7 +128,7 @@ const ContributeData: React.FC = () => {
             <button
                 onClick={handleSubmit}
                 disabled={!imageFile || !gender || isLoading}
-                className="w-full flex items-center justify-center gap-3 bg-amber-500 text-white font-bold py-4 px-4 rounded-lg hover:bg-amber-600 disabled:bg-slate-400 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
+                className="w-full flex items-center justify-center gap-3 bg-amber-500 text-white font-bold py-4 px-4 rounded-lg hover:bg-amber-600 disabled:bg-slate-400 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-100"
             >
                 {isLoading ? <><Spinner /> Submitting Data...</> : <><SparklesIcon className="w-6 h-6"/>Submit Contribution</>}
             </button>
@@ -136,7 +136,7 @@ const ContributeData: React.FC = () => {
             
         <div className="min-h-[3rem] flex items-center justify-center pt-4">
             {error && <p className="text-red-600 bg-red-100 p-3 rounded-lg w-full text-center font-semibold animate-shake">{error}</p>}
-            {successMessage && <p className="text-green-700 bg-green-100 p-3 rounded-lg w-full text-center font-semibold">{successMessage}</p>}
+            {successMessage && <p className="text-green-700 bg-green-100 p-3 rounded-lg w-full text-center font-semibold animate-fade-in">{successMessage}</p>}
         </div>
       </div>
     </div>

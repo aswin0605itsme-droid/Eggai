@@ -72,7 +72,7 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
   }, [imageFile, batchNumber, addBatchResult]);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-3xl font-bold text-slate-800 font-serif">Predict Chick Sex from an Egg Photo</h2>
         <p className="text-slate-600 mt-2 max-w-2xl mx-auto">
@@ -81,7 +81,7 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        <div className="space-y-6 p-6 bg-white rounded-xl border border-slate-200">
+        <div className="space-y-6 p-6 bg-white rounded-xl border border-slate-200 shadow-sm transition hover:shadow-lg">
           <div>
               <label htmlFor="batch-number-image" className="block text-sm font-bold text-slate-700 mb-2">
                   Step 1: Enter Batch Number
@@ -98,18 +98,19 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
 
           <div>
             <label htmlFor="egg-upload" className="block text-sm font-bold text-slate-700 mb-2">Step 2: Upload Egg Image</label>
-            <div className="flex items-center justify-center w-full">
-              <label htmlFor="egg-upload" className={`group flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors relative overflow-hidden ${!batchNumber ? 'bg-slate-100 cursor-not-allowed border-slate-300' : 'bg-amber-50 hover:bg-amber-100 border-amber-300'}`}>
+            <div className="w-full">
+              <label htmlFor="egg-upload" className={`group flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300 relative overflow-hidden ${!batchNumber ? 'bg-slate-100 cursor-not-allowed border-slate-300' : 'bg-amber-50 hover:bg-amber-100 border-amber-300 hover:border-amber-400'}`}>
                 {imagePreview && batchNumber ? (
-                  <img src={imagePreview} alt="Egg preview" className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105" />
+                  <img src={imagePreview} alt="Egg preview" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 ) : (
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
-                    <UploadIcon className="w-10 h-10 mb-3 text-amber-500" />
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center z-10">
+                    <UploadIcon className="w-10 h-10 mb-3 text-amber-500 transition-transform group-hover:scale-110" />
                     <p className="mb-2 text-sm text-amber-700"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                     <p className="text-xs text-amber-600">PNG, JPG, or WEBP</p>
-                    {!batchNumber && <p className="text-xs text-red-500 mt-2">Enter batch number to enable upload.</p>}
+                    {!batchNumber && <p className="text-xs text-red-500 mt-2">Enter batch number to enable.</p>}
                   </div>
                 )}
+                <div className={`absolute inset-0 bg-white/50 transition-opacity duration-300 ${imagePreview && batchNumber ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}></div>
                 <input id="egg-upload" type="file" className="hidden" accept="image/*" onChange={handleFileChange} disabled={!batchNumber} />
               </label>
             </div>
@@ -118,7 +119,7 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
           <button
             onClick={handleAnalyze}
             disabled={!imageFile || isLoading || !batchNumber}
-            className="w-full flex items-center justify-center gap-2 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 disabled:bg-slate-300 transition-all transform hover:scale-105 active:scale-100"
+            className="w-full flex items-center justify-center gap-2 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 disabled:bg-slate-300 transition-all duration-200 transform hover:scale-[1.02] active:scale-100"
           >
             {isLoading ? <><Spinner /> Analyzing...</> : <><SparklesIcon className="w-5 h-5" /> Analyze & Log Result</>}
           </button>
@@ -126,11 +127,18 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
 
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-slate-700">Analysis Results</h3>
-          <div className="bg-white rounded-xl p-4 min-h-[20rem] border border-slate-200 shadow-sm">
+          <div className="bg-white rounded-xl p-6 min-h-[24rem] border border-slate-200 shadow-sm">
             {error && <p className="text-red-500">{error}</p>}
+            {isLoading && (
+                 <div className="space-y-4 animate-pulse">
+                    <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-slate-200 rounded w-full"></div>
+                    <div className="h-4 bg-slate-200 rounded w-5/6"></div>
+                    <div className="h-4 bg-slate-200 rounded w-1/2"></div>
+                </div>
+            )}
             {!analysis && !isLoading && <p className="text-slate-500">Enter a batch number and upload an image to see the results here.</p>}
-            {isLoading && <div className="flex flex-col items-center justify-center h-full text-slate-500"><Spinner size="md" /><p className="mt-4 animate-pulse">AI is analyzing the egg's morphology...</p></div>}
-            {analysis && <div className="text-slate-800 whitespace-pre-wrap prose prose-sm">{analysis}</div>}
+            {analysis && <div className="text-slate-800 whitespace-pre-wrap prose prose-sm max-w-none">{analysis}</div>}
           </div>
         </div>
       </div>

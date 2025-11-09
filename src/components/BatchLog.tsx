@@ -29,13 +29,13 @@ const BatchLog: React.FC<BatchLogProps> = ({ log }) => {
   };
 
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-slate-200">
+    <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-slate-200/80 animate-slide-in-fade-up">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-            <h2 className="text-2xl font-bold text-slate-700">Batch Prediction Log</h2>
+            <h2 className="text-2xl font-bold text-slate-800 font-serif">Batch Prediction Log</h2>
             <button
                 onClick={handleDownloadCSV}
                 disabled={log.length === 0}
-                className="flex items-center gap-2 bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-slate-300 transition-colors"
+                className="flex items-center gap-2 bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-slate-300 transition-all transform hover:scale-105 active:scale-100"
             >
                 <DownloadIcon className="w-5 h-5" />
                 Download CSV
@@ -53,7 +53,7 @@ const BatchLog: React.FC<BatchLogProps> = ({ log }) => {
                         <th scope="col" className="px-6 py-3">Timestamp</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-slate-200">
                     {log.length === 0 ? (
                         <tr>
                             <td colSpan={4} className="text-center py-8 text-slate-500">
@@ -62,7 +62,7 @@ const BatchLog: React.FC<BatchLogProps> = ({ log }) => {
                         </tr>
                     ) : (
                         log.map((row, index) => (
-                            <tr key={index} className="bg-white border-b last:border-b-0 border-slate-200 hover:bg-slate-50/50">
+                            <tr key={index} className="bg-white hover:bg-slate-50/50 transition-colors">
                                 <td className="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">{row.batchNumber}</td>
                                 <td className={`px-6 py-4 font-semibold whitespace-nowrap ${row.prediction === 'Female' ? 'text-pink-600' : row.prediction === 'Male' ? 'text-blue-600' : 'text-slate-600'}`}>{row.prediction}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">{row.source}</td>
