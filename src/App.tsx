@@ -1,4 +1,3 @@
-// FIX: Corrected the React import to properly destructure the `useState` and `useCallback` hooks. The original import statement was invalid.
 import React, { useState, useCallback } from 'react';
 import Header from './components/Header';
 import AnalyzeEgg from './components/AnalyzeEgg';
@@ -14,7 +13,6 @@ import { BatchResult } from './types';
 type Tab = 'analyze' | 'live' | 'batch' | 'model' | 'contribute' | 'research';
 
 const App: React.FC = () => {
-  // FIX: Removed incorrect `aistudio` prefix from React's `useState` hook calls.
   const [activeTab, setActiveTab] = useState<Tab>('analyze');
   const [batchLog, setBatchLog] = useState<BatchResult[]>([]);
 
@@ -26,7 +24,6 @@ const App: React.FC = () => {
     setBatchLog(prevLog => [newResult, ...prevLog]);
   };
 
-  // FIX: Removed incorrect `aistudio` prefix from React's `useCallback` hook call.
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case 'analyze':
