@@ -1,8 +1,5 @@
-
-
 import { GoogleGenAI, GenerateContentResponse, Type, LatLng } from "@google/genai";
 
-// FIX: Initialize the Google Gemini AI client with the API key from environment variables per the coding guidelines.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // Helper function to convert a File object to a base64 string
@@ -32,12 +29,10 @@ const blobToGenerativePart = async (blob: Blob) => {
 /**
  * Analyzes an egg image to predict chick sex.
  */
-// FIX: Updated return type because GenerateContentStreamResult is not an exported member.
 export const analyzeEggImage = async (imageFile: File): Promise<AsyncGenerator<GenerateContentResponse>> => {
   const imagePart = await fileToGenerativePart(imageFile);
   const prompt = `Based on established scientific research on egg morphology (shape index, ovality, etc.), analyze this egg image to predict the probable sex of the chick inside. Provide a detailed analysis explaining your reasoning and conclude with a clear prediction (Male or Female).`;
 
-  // FIX: Use generateContentStream for a streaming response.
   const stream = await ai.models.generateContentStream({
     model: 'gemini-2.5-flash',
     contents: { parts: [imagePart, { text: prompt }] },
@@ -49,9 +44,7 @@ export const analyzeEggImage = async (imageFile: File): Promise<AsyncGenerator<G
 /**
  * Asks a complex question with optional "thinking" time.
  */
-// FIX: Updated return type because GenerateContentStreamResult is not an exported member.
 export const askQuestion = async (prompt: string, useThinking: boolean): Promise<AsyncGenerator<GenerateContentResponse>> => {
-  // FIX: Use generateContentStream and enable thinkingConfig for complex queries.
   const stream = await ai.models.generateContentStream({
     model: useThinking ? 'gemini-2.5-pro' : 'gemini-2.5-flash',
     contents: prompt,
@@ -63,10 +56,8 @@ export const askQuestion = async (prompt: string, useThinking: boolean): Promise
 /**
  * Analyzes a video concept.
  */
-// FIX: Updated return type because GenerateContentStreamResult is not an exported member.
 export const analyzeVideo = async (prompt: string): Promise<AsyncGenerator<GenerateContentResponse>> => {
   const fullPrompt = `You are a video analysis expert. A user has provided the title or topic of a video: "${prompt}". You have not actually seen the video. Based on this topic, provide a conceptual summary of what the video likely contains, its potential themes, and the key information a viewer might take away.`;
-  // FIX: Use generateContentStream for a streaming text response.
   const stream = await ai.models.generateContentStream({
     model: 'gemini-2.5-flash',
     contents: fullPrompt,
@@ -78,7 +69,6 @@ export const analyzeVideo = async (prompt: string): Promise<AsyncGenerator<Gener
  * Searches the web for information.
  */
 export const searchWeb = async (prompt: string): Promise<GenerateContentResponse> => {
-  // FIX: Use generateContent with the googleSearch tool for web grounding.
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
     contents: prompt,
@@ -93,7 +83,6 @@ export const searchWeb = async (prompt: string): Promise<GenerateContentResponse
  * Searches Google Maps for places.
  */
 export const searchMaps = async (prompt: string, location: { latitude: number; longitude: number }): Promise<GenerateContentResponse> => {
-  // FIX: Use generateContent with the googleMaps tool and provide location coordinates.
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
     contents: prompt,
@@ -112,7 +101,6 @@ export const searchMaps = async (prompt: string, location: { latitude: number; l
 /**
  * Generates an image based on a text prompt.
  */
-// FIX: Added missing generateImage function.
 export const generateImage = async (prompt: string): Promise<string> => {
   const response = await ai.models.generateImages({
     model: 'imagen-4.0-generate-001',
@@ -141,7 +129,12 @@ export interface LiveAnalysisResult {
  */
 export const analyzeLiveFrame = async (imageBlob: Blob): Promise<LiveAnalysisResult> => {
   const imagePart = await blobToGenerativePart(imageBlob);
-  const prompt = `You are an expert in poultry science and computer vision. Analyze this single image of a chicken egg. First, conceptually correct its orientation so the long axis is vertical and the broader end is at the top. Then, based on its morphology (shape index, ovality, roundness vs. pointiness of the narrow end), predict the probable sex of the chick inside. Provide a detailed analysis explaining your reasoning and conclude with a clear prediction. Return a JSON object containing your prediction ('Male' or 'Female') and the detailed analysis text.`;
+  const prompt = `You are an expert in poultry science and advanced computer vision. Your task is to analyze this image of a chicken egg with high precision. Follow these steps carefully:
+1.  **Image Segmentation:** First, identify and isolate the primary chicken egg from the background.
+2.  **Orientation Analysis & Correction:** Determine the egg's current orientation. Conceptually rotate and align the egg so that its long axis is perfectly vertical and its broader, blunter end is at the top. This standardized orientation is critical for accurate analysis.
+3.  **Morphological Prediction:** *After* performing the conceptual re-orientation, conduct a detailed morphological analysis on the aligned egg shape. Evaluate its shape index, ovality, and the curvature of its narrow end.
+4.  **Final Prediction:** Based on your analysis of the correctly oriented egg, provide your final prediction.
+Return a JSON object containing your prediction ('Male' or 'Female') and the detailed analysis text, explaining your reasoning from the morphological features.`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
@@ -186,7 +179,6 @@ interface EggMeasurements {
 export const predictEggSexFromMeasurements = async (measurements: EggMeasurements): Promise<'male' | 'female' | 'unknown'> => {
   const prompt = `Given the following egg measurements: Mass=${measurements.mass}g, Long Axis=${measurements.long_axis}mm, Short Axis=${measurements.short_axis}mm. Predict the sex of the chick.`;
 
-  // FIX: Use JSON mode with a response schema for structured output.
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
     contents: prompt,
@@ -238,7 +230,6 @@ export const simulateRusBoostPrediction = async (measurements: FullEggMeasuremen
 
 Based on the typical patterns found in poultry science research where these metrics are used, output your prediction. Generally, rounder eggs (higher shape index) are associated with females.`;
 
-    // FIX: Use JSON mode for a structured prediction and confidence score.
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,
@@ -266,7 +257,6 @@ Based on the typical patterns found in poultry science research where these metr
         return jsonResponse;
     } catch (e) {
         console.error("Failed to parse JSON from simulated model:", response.text);
-        // Fallback response
         return { prediction: 'female', confidence: 0.5 };
     }
 };

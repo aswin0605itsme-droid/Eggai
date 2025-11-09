@@ -1,48 +1,29 @@
-const CACHE_NAME = 'chick-sexing-ai-cache-v1';
+const CACHE_NAME = 'chick-sexing-ai-cache-v2';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
-  '/index.tsx',
-  '/App.tsx',
-  '/types.ts',
-  '/services/geminiService.ts',
-  '/components/Header.tsx',
-  '/components/AnalyzeEgg.tsx',
-  '/components/ImageGenerator.tsx',
-  '/components/ResearchHub.tsx',
-  '/components/Spinner.tsx',
-  '/components/Icons.tsx',
-  '/components/BatchProcess.tsx',
-  '/components/ModelSimulator.tsx',
-  '/components/ContributeData.tsx',
-  '/components/LiveScan.tsx',
-  '/components/BatchLog.tsx'
+  '/manifest.json'
 ];
 
 self.addEventListener('install', event => {
-  // Perform install steps
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Opened cache');
-        // AddAll is atomic, if one fails, the whole operation fails.
         return cache.addAll(URLS_TO_CACHE);
       })
   );
 });
 
 self.addEventListener('fetch', event => {
-  // Use a "cache-first" strategy.
+  // Use a "network-first, then cache" strategy.
+  // This is good for development and ensures users get the latest version.
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        // Not in cache - fetch from network
-        return fetch(event.request);
-      })
+    fetch(event.request).catch(() => {
+      return caches.match(event.request).then(response => {
+        return response || caches.match('/');
+      });
+    })
   );
 });
 
