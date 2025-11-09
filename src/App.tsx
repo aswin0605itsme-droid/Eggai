@@ -7,10 +7,11 @@ import ModelSimulator from './components/ModelSimulator';
 import ContributeData from './components/ContributeData';
 import LiveScan from './components/LiveScan';
 import BatchLog from './components/BatchLog';
-import { EggIcon, CameraIcon, ClipboardListIcon, BeakerIcon, DatabasePlusIcon, SearchIcon } from './components/Icons';
+import ImageGenerator from './components/ImageGenerator';
+import { EggIcon, CameraIcon, ClipboardListIcon, BeakerIcon, DatabasePlusIcon, SearchIcon, ImageIcon } from './components/Icons';
 import { BatchResult } from './types';
 
-type Tab = 'analyze' | 'live' | 'batch' | 'model' | 'contribute' | 'research';
+type Tab = 'analyze' | 'live' | 'batch' | 'model' | 'contribute' | 'research' | 'image';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('analyze');
@@ -38,6 +39,8 @@ const App: React.FC = () => {
         return <ContributeData />;
       case 'research':
         return <ResearchHub />;
+      case 'image':
+        return <ImageGenerator />;
       default:
         return <AnalyzeEgg addBatchResult={addBatchResult} />;
     }
@@ -73,6 +76,7 @@ const App: React.FC = () => {
             <TabButton tab="model" label="Simulator" icon={<BeakerIcon className="w-6 h-6" />} />
             <TabButton tab="contribute" label="Contribute" icon={<DatabasePlusIcon className="w-6 h-6" />} />
             <TabButton tab="research" label="Research" icon={<SearchIcon className="w-6 h-6" />} />
+            <TabButton tab="image" label="Generate" icon={<ImageIcon className="w-6 h-6" />} />
           </div>
           <div className="p-4 sm:p-6 md:p-8 bg-slate-50/50">
             {renderTabContent()}
