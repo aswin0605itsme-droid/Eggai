@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useCallback } from 'react';
 import { generateImage } from '../services/geminiService';
 import { ImageIcon, SparklesIcon } from './Icons';
@@ -33,7 +35,7 @@ const ImageGenerator: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-800">AI Image Generator</h2>
+        <h2 className="text-3xl font-bold text-slate-800 font-serif">AI Image Generator</h2>
         <p className="text-slate-600 mt-2 max-w-2xl mx-auto">
           Use the power of AI to generate unique images related to poultry, eggs, or anything you can imagine.
         </p>

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { analyzeLiveFrame, LiveAnalysisResult } from '../services/geminiService';
 import { CameraIcon, StopCircleIcon, SparklesIcon } from './Icons';
@@ -106,7 +108,7 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
     return (
         <div className="space-y-6 animate-fade-in">
              <div className="text-center">
-                <h2 className="text-3xl font-bold text-slate-800">Live Video Scan & Analysis</h2>
+                <h2 className="text-3xl font-bold text-slate-800 font-serif">Live Video Scan & Analysis</h2>
                 <p className="text-slate-600 mt-2 max-w-2xl mx-auto">
                     Enter a batch number, point your camera at an egg, and capture a frame for the AI to analyze and log.
                 </p>
@@ -134,9 +136,19 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
                 <canvas ref={captureCanvasRef} className="hidden" />
                 
                 {!isCameraOn && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50">
-                        <CameraIcon className="w-24 h-24 text-slate-600" />
-                        <p className="text-slate-400 mt-2">Enter a batch number, then start the camera.</p>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-60 text-center p-4">
+                        {isLoading ? (
+                            <>
+                                <Spinner size="lg" />
+                                <p className="text-slate-300 mt-4 text-lg font-semibold">Initializing Camera...</p>
+                                <p className="text-slate-400 mt-1 text-sm">Please allow camera permissions if prompted.</p>
+                            </>
+                        ) : (
+                            <>
+                                <CameraIcon className="w-24 h-24 text-slate-600" />
+                                <p className="text-slate-400 mt-2">Enter a batch number, then start the camera.</p>
+                            </>
+                        )}
                     </div>
                 )}
             </div>

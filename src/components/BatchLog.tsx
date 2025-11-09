@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { BatchResult } from '../types';
 import { DownloadIcon } from './Icons';

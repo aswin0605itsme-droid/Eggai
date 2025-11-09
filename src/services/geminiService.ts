@@ -1,5 +1,6 @@
 import { GoogleGenAI, GenerateContentResponse, Type, LatLng } from "@google/genai";
 
+// FIX: Initialize with `process.env.API_KEY` as per coding guidelines.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // Helper function to convert a File object to a base64 string

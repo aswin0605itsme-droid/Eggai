@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useMemo, useCallback } from 'react';
 import { simulateRusBoostPrediction } from '../services/geminiService';
 import { SparklesIcon } from './Icons';
@@ -90,7 +92,7 @@ const ModelSimulator: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
        <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-800">RUSBoost Model Simulator</h2>
+        <h2 className="text-3xl font-bold text-slate-800 font-serif">RUSBoost Model Simulator</h2>
         <p className="text-slate-600 mt-2 max-w-2xl mx-auto">
           Interactively explore how different egg measurements influence the chick sex prediction based on a simulated classifier.
         </p>

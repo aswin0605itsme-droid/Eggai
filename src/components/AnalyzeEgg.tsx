@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useCallback } from 'react';
 import { analyzeEggImage } from '../services/geminiService';
 import { UploadIcon, SparklesIcon } from './Icons';
@@ -72,7 +74,7 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-800">Predict Chick Sex from an Egg Photo</h2>
+        <h2 className="text-3xl font-bold text-slate-800 font-serif">Predict Chick Sex from an Egg Photo</h2>
         <p className="text-slate-600 mt-2 max-w-2xl mx-auto">
           Enter a batch number, upload a clear photo of a single chicken egg, and the AI will analyze its shape to predict the likely sex.
         </p>

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useCallback } from 'react';
 import { predictEggSexFromMeasurements } from '../services/geminiService';
 import { SparklesIcon } from './Icons';
@@ -143,7 +145,7 @@ const BatchProcess: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-800">Batch Process Egg Data</h2>
+        <h2 className="text-3xl font-bold text-slate-800 font-serif">Batch Process Egg Data</h2>
         <p className="text-slate-600 mt-2 max-w-2xl mx-auto">
           Upload a CSV with `mass`, `long_axis`, and `short_axis` columns to predict the sex for multiple eggs at once.
         </p>

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useCallback } from 'react';
 import { UploadIcon, SparklesIcon, MaleIcon, FemaleIcon } from './Icons';
 import Spinner from './Spinner';
@@ -81,7 +83,7 @@ const ContributeData: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-800">Help Us Improve</h2>
+        <h2 className="text-3xl font-bold text-slate-800 font-serif">Help Us Improve</h2>
         <p className="text-slate-600 mt-2 max-w-2xl mx-auto">
           Your contributions are vital for training a more accurate AI. By uploading a photo of an egg with a known outcome, you directly help advance this technology.
         </p>

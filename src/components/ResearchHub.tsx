@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useCallback } from 'react';
 import { askQuestion, searchWeb, searchMaps, analyzeVideo } from '../services/geminiService';
 import { BrainCircuitIcon, SearchIcon, MapPinIcon, VideoIcon } from './Icons';
@@ -113,7 +115,7 @@ const ResearchHub: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-800">AI Research Hub</h2>
+        <h2 className="text-3xl font-bold text-slate-800 font-serif">AI Research Hub</h2>
         <p className="text-slate-600 mt-2 max-w-2xl mx-auto">
             Leverage AI-powered tools for deep research, web searches, and content analysis.
         </p>

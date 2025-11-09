@@ -2,6 +2,25 @@ import React from 'react';
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
+export const LogoIcon = (props: IconProps) => (
+    <svg viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <path d="M64 128C89.467 128 128 99.3472 128 64C128 28.6528 89.467 0 64 0C38.533 0 0 28.6528 0 64C0 99.3472 38.533 128 64 128Z" fill="url(#paint0_linear_1_2)"/>
+        <path d="M64 112C81.6731 112 109 89.1213 109 64C109 38.8787 81.6731 16 64 16C46.3269 16 19 38.8787 19 64C19 89.1213 46.3269 112 64 112Z" stroke="white" strokeOpacity="0.5" strokeWidth="2"/>
+        <path d="M64 96C74.4934 96 92 81.4036 92 64C92 46.5964 74.4934 32 64 32C53.5066 32 36 46.5964 36 64C36 81.4036 53.5066 96 64 96Z" fill="url(#paint1_radial_1_2)"/>
+        <defs>
+            <linearGradient id="paint0_linear_1_2" x1="64" y1="0" x2="64" y2="128" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#FBBF24"/>
+                <stop offset="1" stopColor="#F59E0B"/>
+            </linearGradient>
+            <radialGradient id="paint1_radial_1_2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(64 64) rotate(90) scale(32)">
+                <stop stopColor="white"/>
+                <stop offset="1" stopColor="white" stopOpacity="0"/>
+            </radialGradient>
+        </defs>
+    </svg>
+);
+
+
 export const EggIcon = (props: IconProps) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
     <path d="M12 2C9.243 2 7 4.243 7 7c0 2.228 1.492 4.093 3.5 4.755V12c0 1.105-.895 2-2 2s-2-.895-2-2v-.245C4.508 11.093 3 9.228 3 7c0-2.757 2.243-5 5-5h8c2.757 0 5 2.243 5 5c0 2.228-1.492 4.093-3.5 4.755V12c0 1.105.895 2 2 2s2-.895 2-2v-.245c2.008-.662 3.5-2.527 3.5-4.755C21 4.243 18.757 2 16 2H12Zm-1 15c-2.757 0-5 2.243-5 5h10c0-2.757-2.243-5-5-5Z"/>
