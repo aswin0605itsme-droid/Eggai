@@ -137,7 +137,7 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
                 )}
             </div>
 
-            <div className="flex flex-wrap justify-center items-center gap-4">
+             <div className="flex flex-wrap justify-center items-center gap-4">
                  <button
                     onClick={isCameraOn ? stopCamera : startCamera}
                     disabled={isLoading || (!batchNumber && !isCameraOn)}
@@ -159,19 +159,22 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
                     </button>
                 )}
             </div>
-             {error && <p className="text-center text-red-500 bg-red-50 p-3 rounded-lg">{error}</p>}
+             
+             <div className="max-w-4xl mx-auto">
+                {error && <p className="text-center text-red-500 bg-red-50 p-3 rounded-lg">{error}</p>}
 
-             {analysisResult && (
-                <div className="max-w-4xl mx-auto mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                    <h3 className="font-semibold text-lg text-gray-800">Latest Analysis Result</h3>
-                    <p className="text-3xl font-bold mt-2">
-                        Prediction: <span className={analysisResult.prediction === 'Female' ? 'text-pink-600' : 'text-blue-600'}>
-                            {analysisResult.prediction || 'Unknown'}
-                        </span>
-                    </p>
-                    <p className="text-gray-700 mt-2 whitespace-pre-wrap">{analysisResult.analysis_text}</p>
-                </div>
-            )}
+                {analysisResult && (
+                    <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                        <h3 className="font-semibold text-lg text-gray-800">Latest Analysis Result</h3>
+                        <p className="text-3xl font-bold mt-2">
+                            Prediction: <span className={analysisResult.prediction === 'Female' ? 'text-pink-600' : 'text-blue-600'}>
+                                {analysisResult.prediction || 'Unknown'}
+                            </span>
+                        </p>
+                        <p className="text-gray-700 mt-2 whitespace-pre-wrap">{analysisResult.analysis_text}</p>
+                    </div>
+                )}
+             </div>
         </div>
     );
 };
