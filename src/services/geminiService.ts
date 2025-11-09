@@ -168,12 +168,11 @@ Return a JSON object containing your prediction ('Male' or 'Female') and the det
 };
 
 /**
- * Quickly checks if a video frame contains a well-aligned egg.
- * This is a lightweight pre-check for the auto-capture feature.
+ * Quickly checks if a video frame contains a well-aligned egg and provides a confidence score.
  */
-export const checkFrameAlignment = async (imageBlob: Blob): Promise<{ is_aligned: boolean }> => {
+export const checkFrameAlignment = async (imageBlob: Blob): Promise<{ is_aligned: boolean; confidence: number }> => {
   const imagePart = await blobToGenerativePart(imageBlob);
-  const prompt = `Analyze this image. Is there a single, clear, well-lit chicken egg in the center of the frame, taking up a significant portion of the view? Answer with only a JSON object: {"is_aligned": boolean}. Do not add any other text or markdown formatting.`;
+  const prompt = `Analyze this image for a single, clear, well-lit chicken egg. Is it well-aligned in the center and suitable for analysis? Provide a confidence score from 0.0 (not suitable) to 1.0 (perfectly suitable). Return a JSON object: {"is_aligned": boolean, "confidence": number}. Do not add any other text or markdown formatting.`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
@@ -185,10 +184,14 @@ export const checkFrameAlignment = async (imageBlob: Blob): Promise<{ is_aligned
             properties: {
                 is_aligned: {
                     type: Type.BOOLEAN,
-                    description: "True if a single, clear, well-aligned egg is found, otherwise false."
+                    description: "True if a single, clear, well-aligned egg is found."
+                },
+                confidence: {
+                    type: Type.NUMBER,
+                    description: "A confidence score from 0.0 to 1.0 on the alignment quality."
                 }
             },
-            required: ["is_aligned"]
+            required: ["is_aligned", "confidence"]
         }
     }
   });
@@ -197,7 +200,7 @@ export const checkFrameAlignment = async (imageBlob: Blob): Promise<{ is_aligned
     return JSON.parse(response.text);
   } catch (e) {
     console.error("Failed to parse JSON from alignment check:", response.text);
-    return { is_aligned: false };
+    return { is_aligned: false, confidence: 0 };
   }
 };
 

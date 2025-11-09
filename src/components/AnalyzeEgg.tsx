@@ -182,18 +182,35 @@ const AnalyzeEgg: React.FC<AnalyzeEggProps> = ({ addBatchResult }) => {
               </button>
             )}
           </div>
-          <div className="bg-white rounded-xl p-6 min-h-[24rem] border border-slate-200 shadow-sm">
-            {error && <p className="text-red-500">{error}</p>}
-            {isLoading && (
-                 <div className="space-y-4 animate-pulse">
-                    <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-slate-200 rounded w-full"></div>
-                    <div className="h-4 bg-slate-200 rounded w-5/6"></div>
-                    <div className="h-4 bg-slate-200 rounded w-1/2"></div>
-                </div>
-            )}
-            {!analysis && !isLoading && <p className="text-slate-500">Enter a batch number and upload an image to see the results here.</p>}
-            {analysis && <div className="text-slate-800 whitespace-pre-wrap prose prose-sm max-w-none">{analysis}</div>}
+          <div className="bg-white rounded-xl p-6 min-h-[24rem] border border-slate-200 shadow-sm flex flex-col">
+            {(() => {
+                if (isLoading) {
+                    return (
+                        <div className="flex-grow flex flex-col items-center justify-center text-center">
+                            <Spinner size="lg" className="text-amber-500" />
+                            <h3 className="mt-4 text-lg font-semibold text-slate-700 animate-pulse">Analyzing Egg...</h3>
+                            <p className="text-slate-500">The AI is examining the egg's morphology.</p>
+                        </div>
+                    );
+                }
+                if (error) {
+                    return (
+                        <div className="flex-grow flex flex-col items-center justify-center text-center">
+                            <p className="text-red-500">{error}</p>
+                        </div>
+                    );
+                }
+                if (analysis) {
+                    return (
+                        <div className="text-slate-800 whitespace-pre-wrap prose prose-sm max-w-none">{analysis}</div>
+                    );
+                }
+                return (
+                    <div className="flex-grow flex flex-col items-center justify-center text-center">
+                        <p className="text-slate-500">Enter a batch number and upload an image to see the results here.</p>
+                    </div>
+                );
+            })()}
           </div>
         </div>
       </div>

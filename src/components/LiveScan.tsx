@@ -16,6 +16,7 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isScanning, setIsScanning] = useState(false);
     const [isAutoCaptureEnabled, setIsAutoCaptureEnabled] = useState(false);
+    const [autoCaptureThreshold, setAutoCaptureThreshold] = useState(0.9);
     const [error, setError] = useState<string | null>(null);
     const [analysisResult, setAnalysisResult] = useState<LiveAnalysisResult | null>(null);
     const [batchNumber, setBatchNumber] = useState<string>('');
@@ -148,7 +149,7 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
                     if (blob) {
                         try {
                             const alignmentResult = await checkFrameAlignment(blob);
-                            if (alignmentResult.is_aligned) {
+                            if (alignmentResult.is_aligned && alignmentResult.confidence >= autoCaptureThreshold) {
                                 if (autoCaptureIntervalRef.current) {
                                     clearInterval(autoCaptureIntervalRef.current);
                                     autoCaptureIntervalRef.current = null;
@@ -176,7 +177,7 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
                 setIsScanning(false);
             }
         };
-    }, [isCameraOn, isAutoCaptureEnabled, isAnalyzing, isScanning, handleAnalyzeFrame]);
+    }, [isCameraOn, isAutoCaptureEnabled, isAnalyzing, isScanning, handleAnalyzeFrame, autoCaptureThreshold]);
     
     return (
         <div className="space-y-6 animate-fade-in">
@@ -258,17 +259,40 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
                     )}
                 </div>
                 {isCameraOn && (
-                     <label className="flex items-center cursor-pointer select-none">
-                        <input 
-                            type="checkbox" 
-                            checked={isAutoCaptureEnabled}
-                            onChange={(e) => setIsAutoCaptureEnabled(e.target.checked)}
-                            className="sr-only peer"
-                            disabled={!isCameraOn || isAnalyzing}
-                        />
-                        <div className="relative w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-amber-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
-                        <span className="ms-3 text-sm font-medium text-slate-700">Automatic Capture</span>
-                    </label>
+                    <div className="p-4 bg-slate-100 rounded-lg w-full max-w-sm">
+                        <label className="flex items-center cursor-pointer select-none">
+                            <input 
+                                type="checkbox" 
+                                checked={isAutoCaptureEnabled}
+                                onChange={(e) => setIsAutoCaptureEnabled(e.target.checked)}
+                                className="sr-only peer"
+                                disabled={!isCameraOn || isAnalyzing}
+                            />
+                            <div className="relative w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-amber-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                            <span className="ms-3 text-sm font-medium text-slate-700">Automatic Capture</span>
+                        </label>
+                        {isAutoCaptureEnabled && (
+                            <div className="w-full mt-3 space-y-2 animate-fade-in">
+                                <label htmlFor="threshold-slider" className="flex justify-between items-center text-xs font-medium text-slate-600">
+                                <span>Capture Confidence Threshold</span>
+                                <span className="font-semibold text-slate-800 bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                                    {Math.round(autoCaptureThreshold * 100)}%
+                                </span>
+                                </label>
+                                <input
+                                id="threshold-slider"
+                                type="range"
+                                min="0.7"
+                                max="0.99"
+                                step="0.01"
+                                value={autoCaptureThreshold}
+                                onChange={(e) => setAutoCaptureThreshold(parseFloat(e.target.value))}
+                                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                                disabled={isScanning || isAnalyzing}
+                                />
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
              
