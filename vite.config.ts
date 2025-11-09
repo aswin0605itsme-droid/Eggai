@@ -1,7 +1,11 @@
-import { defineConfig } from 'vite'
+// FIX: Replaced placeholder content with a valid Vitest configuration.
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-
-// https://vitejs.dev/config/
+ 
+// https://vitest.dev/config/
 export default defineConfig({
   plugins: [react()],
+  test: {
+    environment: 'jsdom',
+  },
 })
