@@ -1,0 +1,8 @@
+{
+  "name": "Copy of Chick-Sexing AI Assistant",
+  "description": "An advanced AI-powered application to analyze egg morphology for chick sex prediction, explore research, and generate related content, helping to address ethical and economic issues in the poultry industry.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ]
+}
