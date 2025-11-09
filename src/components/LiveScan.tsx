@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { analyzeLiveFrame, LiveAnalysisResult } from '../services/geminiService';
+import { analyzeLiveFrame, checkFrameAlignment, LiveAnalysisResult } from '../services/geminiService';
 import { CameraIcon, StopCircleIcon, SparklesIcon } from './Icons';
 import Spinner from './Spinner';
 import { BatchResult } from '../types';
@@ -14,6 +14,8 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
     const [isCameraOn, setIsCameraOn] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [isScanning, setIsScanning] = useState(false);
+    const [isAutoCaptureEnabled, setIsAutoCaptureEnabled] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [analysisResult, setAnalysisResult] = useState<LiveAnalysisResult | null>(null);
     const [batchNumber, setBatchNumber] = useState<string>('');
@@ -21,6 +23,7 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const captureCanvasRef = useRef<HTMLCanvasElement>(null);
     const mediaStreamRef = useRef<MediaStream | null>(null);
+    const autoCaptureIntervalRef = useRef<NodeJS.Timeout | null>(null);
     
     const stopCamera = useCallback(() => {
         if (mediaStreamRef.current) {
@@ -30,9 +33,14 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
         }
+        if (autoCaptureIntervalRef.current) {
+            clearInterval(autoCaptureIntervalRef.current);
+            autoCaptureIntervalRef.current = null;
+        }
         setIsCameraOn(false);
         setIsLoading(false);
         setIsAnalyzing(false);
+        setIsScanning(false);
         setAnalysisResult(null);
         setError(null);
     }, []);
@@ -47,6 +55,9 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
         setIsAnalyzing(true);
         setError(null);
         setAnalysisResult(null);
+        if (autoCaptureIntervalRef.current) {
+            clearInterval(autoCaptureIntervalRef.current);
+        }
 
         const video = videoRef.current;
         const canvas = captureCanvasRef.current;
@@ -105,6 +116,68 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
         }
     }, [isCameraOn, stopCamera, batchNumber]);
     
+    useEffect(() => {
+        if (autoCaptureIntervalRef.current) {
+            clearInterval(autoCaptureIntervalRef.current);
+            autoCaptureIntervalRef.current = null;
+            setIsScanning(false);
+        }
+
+        if (isCameraOn && isAutoCaptureEnabled && !isAnalyzing) {
+            autoCaptureIntervalRef.current = setInterval(async () => {
+                if (!videoRef.current || !captureCanvasRef.current || isScanning || document.hidden) {
+                    return;
+                }
+
+                setIsScanning(true);
+                
+                const video = videoRef.current;
+                const canvas = captureCanvasRef.current;
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+
+                if (!context) {
+                    console.error('Could not get canvas context for auto-capture.');
+                    setIsScanning(false);
+                    return;
+                }
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                canvas.toBlob(async (blob) => {
+                    if (blob) {
+                        try {
+                            const alignmentResult = await checkFrameAlignment(blob);
+                            if (alignmentResult.is_aligned) {
+                                if (autoCaptureIntervalRef.current) {
+                                    clearInterval(autoCaptureIntervalRef.current);
+                                    autoCaptureIntervalRef.current = null;
+                                }
+                                setIsAutoCaptureEnabled(false);
+                                handleAnalyzeFrame();
+                            }
+                        } catch (err) {
+                            console.error("Auto-capture alignment check failed:", err);
+                        } finally {
+                           setIsScanning(false);
+                        }
+                    } else {
+                        setIsScanning(false);
+                    }
+                }, 'image/jpeg', 0.8);
+
+            }, 2000);
+        }
+
+        return () => {
+            if (autoCaptureIntervalRef.current) {
+                clearInterval(autoCaptureIntervalRef.current);
+                autoCaptureIntervalRef.current = null;
+                setIsScanning(false);
+            }
+        };
+    }, [isCameraOn, isAutoCaptureEnabled, isAnalyzing, isScanning, handleAnalyzeFrame]);
+    
     return (
         <div className="space-y-6 animate-fade-in">
              <div className="text-center">
@@ -135,6 +208,14 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
                 <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
                 <canvas ref={captureCanvasRef} className="hidden" />
                 
+                {isScanning && !isAnalyzing && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white p-4 z-20">
+                        <Spinner />
+                        <p className="mt-2 font-semibold">Scanning for a clear shot...</p>
+                        <p className="text-sm text-slate-300">Hold egg steady in the center.</p>
+                    </div>
+                )}
+                
                 {!isCameraOn && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-60 text-center p-4">
                         {isLoading ? (
@@ -153,26 +234,41 @@ const LiveScan: React.FC<LiveScanProps> = ({ addBatchResult }) => {
                 )}
             </div>
 
-             <div className="flex flex-wrap justify-center items-center gap-4">
-                 <button
-                    onClick={isCameraOn ? stopCamera : startCamera}
-                    disabled={isLoading || (!batchNumber && !isCameraOn)}
-                    className={`w-44 flex items-center justify-center gap-3 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 disabled:bg-slate-400 disabled:scale-100
-                        ${isCameraOn ? 'bg-red-500 hover:bg-red-600' : 'bg-amber-500 hover:bg-amber-600'}`}
-                >
-                    {isLoading ? <Spinner /> : isCameraOn ? <StopCircleIcon className="w-6 h-6" /> : <CameraIcon className="w-6 h-6" />}
-                    {isLoading ? 'Starting...' : isCameraOn ? 'Stop Camera' : 'Start Camera'}
-                </button>
-                
-                {isCameraOn && (
+             <div className="flex flex-col items-center gap-4">
+                <div className="flex flex-wrap justify-center items-center gap-4">
                     <button
-                        onClick={handleAnalyzeFrame}
-                        disabled={isAnalyzing}
-                        className="w-44 flex items-center justify-center gap-3 bg-blue-500 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 disabled:bg-slate-400 disabled:scale-100"
+                        onClick={isCameraOn ? stopCamera : startCamera}
+                        disabled={isLoading || (!batchNumber && !isCameraOn)}
+                        className={`w-44 flex items-center justify-center gap-3 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 disabled:bg-slate-400 disabled:scale-100
+                            ${isCameraOn ? 'bg-red-500 hover:bg-red-600' : 'bg-amber-500 hover:bg-amber-600'}`}
                     >
-                       {isAnalyzing ? <Spinner /> : <SparklesIcon className="w-6 h-6" />}
-                       {isAnalyzing ? 'Analyzing...' : 'Analyze & Log'}
+                        {isLoading ? <Spinner /> : isCameraOn ? <StopCircleIcon className="w-6 h-6" /> : <CameraIcon className="w-6 h-6" />}
+                        {isLoading ? 'Starting...' : isCameraOn ? 'Stop Camera' : 'Start Camera'}
                     </button>
+                    
+                    {isCameraOn && (
+                        <button
+                            onClick={handleAnalyzeFrame}
+                            disabled={isAnalyzing || isAutoCaptureEnabled}
+                            className="w-44 flex items-center justify-center gap-3 bg-blue-500 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 disabled:bg-slate-400 disabled:scale-100"
+                        >
+                        {isAnalyzing ? <Spinner /> : <SparklesIcon className="w-6 h-6" />}
+                        {isAnalyzing ? 'Analyzing...' : 'Analyze & Log'}
+                        </button>
+                    )}
+                </div>
+                {isCameraOn && (
+                     <label className="flex items-center cursor-pointer select-none">
+                        <input 
+                            type="checkbox" 
+                            checked={isAutoCaptureEnabled}
+                            onChange={(e) => setIsAutoCaptureEnabled(e.target.checked)}
+                            className="sr-only peer"
+                            disabled={!isCameraOn || isAnalyzing}
+                        />
+                        <div className="relative w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-amber-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                        <span className="ms-3 text-sm font-medium text-slate-700">Automatic Capture</span>
+                    </label>
                 )}
             </div>
              

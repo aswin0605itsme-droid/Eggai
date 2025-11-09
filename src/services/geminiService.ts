@@ -167,6 +167,40 @@ Return a JSON object containing your prediction ('Male' or 'Female') and the det
   }
 };
 
+/**
+ * Quickly checks if a video frame contains a well-aligned egg.
+ * This is a lightweight pre-check for the auto-capture feature.
+ */
+export const checkFrameAlignment = async (imageBlob: Blob): Promise<{ is_aligned: boolean }> => {
+  const imagePart = await blobToGenerativePart(imageBlob);
+  const prompt = `Analyze this image. Is there a single, clear, well-lit chicken egg in the center of the frame, taking up a significant portion of the view? Answer with only a JSON object: {"is_aligned": boolean}. Do not add any other text or markdown formatting.`;
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: { parts: [imagePart, { text: prompt }] },
+    config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+                is_aligned: {
+                    type: Type.BOOLEAN,
+                    description: "True if a single, clear, well-aligned egg is found, otherwise false."
+                }
+            },
+            required: ["is_aligned"]
+        }
+    }
+  });
+
+  try {
+    return JSON.parse(response.text);
+  } catch (e) {
+    console.error("Failed to parse JSON from alignment check:", response.text);
+    return { is_aligned: false };
+  }
+};
+
 
 interface EggMeasurements {
   mass: number;
